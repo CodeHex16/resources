@@ -1,17 +1,305 @@
-<html><body><h1>Directory Listing</h1><ul>
-<li><strong>Directory: .</strong><ul>
-<li><strong>Directory: ./slides</strong><ul>
-<li><a href="./slides/T1.pdf">./slides/T1.pdf</a></li>
-<li><a href="./slides/T10.pdf">./slides/T10.pdf</a></li>
-<li><a href="./slides/T11.pdf">./slides/T11.pdf</a></li>
-<li><a href="./slides/T2.pdf">./slides/T2.pdf</a></li>
-<li><a href="./slides/T3.pdf">./slides/T3.pdf</a></li>
-<li><a href="./slides/T4.pdf">./slides/T4.pdf</a></li>
-<li><a href="./slides/T5.pdf">./slides/T5.pdf</a></li>
-<li><a href="./slides/T6.pdf">./slides/T6.pdf</a></li>
-<li><a href="./slides/T7.pdf">./slides/T7.pdf</a></li>
-<li><a href="./slides/T8.pdf">./slides/T8.pdf</a></li>
-<li><a href="./slides/T9.pdf">./slides/T9.pdf</a></li>
-</ul></li>
-</ul></li>
-</ul></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Manager - codehex16</title>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      .container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        color: #212121;
+      }
+      .file-list {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+      }
+      .file-list th,
+      .file-list td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      .file-list th {
+        background-color: #f9f9f9;
+        font-weight: 500;
+        font-size: 14px;
+      }
+      .file-list td {
+        font-size: 14px;
+        vertical-align: middle;
+      }
+      .file-icon {
+        font-size: 24px;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .file-name {
+        text-decoration: none;
+        color: #6200ea;
+        font-weight: 500;
+      }
+      .file-name:hover {
+        text-decoration: underline;
+      }
+      .icon-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: #333;
+        position: relative;
+      }
+      .icon-btn:hover {
+        color: #6200ea;
+      }
+      .icon-btn .tooltip {
+        display: none;
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .icon-btn:hover .tooltip {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>File Manager</h1>
+      <table class="file-list" id="file-list">
+        <thead>
+          <tr>
+            <th>File/Folder</th>
+            <th>File Size</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script>
+      const apiUrl =
+        "https://api.github.com/repos/codehex16/resources/contents/";
+      const baseUrl = "https://codehex16.github.io/resources/";
+      const rawBaseUrl =
+        "https://raw.githubusercontent.com/CodeHex16/resources/main/";
+
+      const fileIcons = {
+        folder: "folder",
+        pdf: "picture_as_pdf",
+        doc: "description",
+        docx: "description",
+        ppt: "slideshow",
+        pptx: "slideshow",
+        xls: "table_chart",
+        xlsx: "table_chart",
+        png: "image",
+        jpg: "image",
+        jpeg: "image",
+        gif: "image",
+        mp3: "audiotrack",
+        mp4: "movie",
+        zip: "folder_zip",
+        txt: "article",
+        default: "insert_drive_file",
+      };
+
+      function getQueryParameter(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name) || "/";
+      }
+
+      function getParentDirectory() {
+        const parts = getQueryParameter("dir").split("/").filter((part) => part !== "");
+        parts.pop();
+        return `/${parts.join("/")}`;
+      }
+
+      async function fetchDirectory(path = "/") {
+        try {
+          // Replace %2F in path with '/' to handle directories properly
+          path = path.replace(/%2F/g, "/");
+          const response = await fetch(`${apiUrl}${path}`);
+          if (response.status === 403) {
+            const retryAfter = response.headers.get("Retry-After");
+            const message = retryAfter
+              ? `API rate limit exceeded. Please try again after ${retryAfter} seconds.`
+              : "API rate limit exceeded. Please try again after 1 hour.";
+
+            console.error(message);
+            alert(message); // Optionally, show an alert to the user
+            return;
+          }
+
+          const files = await response.json();
+
+          const tableBody = document.querySelector("#file-list tbody");
+          tableBody.innerHTML = ""; // Clear existing rows
+
+          if (path !== "/" && path !== "%2F" && path !== "") {
+            const row = document.createElement("tr");
+            const iconCell = document.createElement("td");
+            const icon = document.createElement("span");
+            icon.classList.add("material-icons", "file-icon");
+            icon.textContent = "arrow_back";
+            const link = document.createElement("a");
+            link.href = `?dir=${encodeURIComponent(getParentDirectory())}`;
+            link.textContent = "..";
+            link.classList.add("file-name");
+            iconCell.appendChild(icon);
+            iconCell.appendChild(link);
+            row.appendChild(iconCell);
+            row.innerHTML += "<td></td><td></td>"; // Empty cells for size and actions
+            tableBody.appendChild(row);
+
+          }
+
+          for (const file of files) {
+            if (
+              file.name.startsWith(".") ||
+              file.name === "README.md" ||
+              file.name === "index.html"
+            ) {
+              continue; // Ignore hidden files, README, index.html, and directories
+            }
+
+            const row = document.createElement("tr");
+
+            // Icon and file name
+            const iconCell = document.createElement("td");
+            const icon = document.createElement("span");
+            const ext = file.name.split(".").pop().toLowerCase();
+            icon.classList.add("material-icons", "file-icon");
+            icon.textContent =
+              file.type === "dir"
+                ? "folder"
+                : fileIcons[ext] || fileIcons["default"];
+            const link = document.createElement("a");
+            link.href = `${baseUrl}${path}${file.name}`;
+            link.textContent = file.name;
+            link.classList.add("file-name");
+            link.target = "_blank"; // Open in new tab for viewing
+
+            if (file.type === "dir") {
+              link.href = `?dir=${encodeURIComponent(path + file.name)}`;
+              link.onclick = (event) => {
+                event.preventDefault();
+                fetchDirectory(path + file.name);
+                // update the URL without reloading the page
+                history.pushState(null, "", `?dir=${encodeURIComponent(path + file.name)}`);
+              };
+            }
+            iconCell.appendChild(icon);
+            iconCell.appendChild(link);
+
+            // File size
+            const sizeCell = document.createElement("td");
+            
+
+            // Actions (download, copy URL buttons)
+            const actionCell = document.createElement("td");
+
+            if (file.type != "dir") {
+              sizeCell.textContent = formatFileSize(file.size);
+              // Download button
+              const downloadButton = createIconButton(
+                "download",
+                "Download",
+                () => {
+                  window.location.href = `${rawBaseUrl}${path}${file.name}`;
+                }
+              );
+              actionCell.appendChild(downloadButton);
+
+              // Copy URL button
+              const copyButton = createIconButton("link", "Copy URL", () => {
+                copyToClipboard(`${baseUrl}${path}${file.name}`);
+              });
+              actionCell.appendChild(copyButton);
+            }
+
+            row.appendChild(iconCell);
+            row.appendChild(sizeCell);
+            row.appendChild(actionCell);
+            tableBody.appendChild(row);
+          }
+        } catch (error) {
+          console.error("Error fetching directory:", error);
+        }
+      }
+
+      function formatFileSize(size) {
+        if (size >= 1024 * 1024) {
+          return (size / (1024 * 1024)).toFixed(2) + " MB";
+        } else if (size >= 1024) {
+          return (size / 1024).toFixed(2) + " KB";
+        } else {
+          return size + " bytes";
+        }
+      }
+
+      function createIconButton(iconName, tooltipText, onClick) {
+        const button = document.createElement("button");
+        button.classList.add("icon-btn");
+        button.onclick = onClick;
+        const icon = document.createElement("span");
+        icon.classList.add("material-icons");
+        icon.textContent = iconName;
+        const tooltip = document.createElement("span");
+        tooltip.classList.add("tooltip");
+        tooltip.textContent = tooltipText;
+        button.appendChild(icon);
+        button.appendChild(tooltip);
+        return button;
+      }
+
+      function copyToClipboard(url) {
+        navigator.clipboard.writeText(url).then(
+          () => {
+            alert("URL copied to clipboard!");
+          },
+          (err) => {
+            console.error("Error copying to clipboard: ", err);
+          }
+        );
+      }
+
+      const currentDir = getQueryParameter("dir");
+      fetchDirectory(currentDir);
+    </script>
+  </body>
+</html>
