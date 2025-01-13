@@ -22,9 +22,6 @@ jobs:
         run: |
           #!/bin/bash
 
-          # Navigate to the resources directory
-          cd resources  # Ensure you're in the 'resources' folder
-
           # Start the HTML structure
           echo "<html><body><h1>Directory Listing</h1><ul>" > index.html
 
@@ -67,7 +64,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
           # Stage the changes
-          git add resources/index.html
+          git add index.html
 
           # Commit and push the changes
           if git commit -m 'Add updated index.html'; then
