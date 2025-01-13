@@ -209,7 +209,7 @@
                 ? "folder"
                 : fileIcons[ext] || fileIcons["default"];
             const link = document.createElement("a");
-            link.href = `${baseUrl}${path}${file.name}`;
+            link.href = `${baseUrl}${path}/${file.name}`;
             link.textContent = file.name;
             link.classList.add("file-name");
             link.target = "_blank"; // Open in new tab for viewing
@@ -240,14 +240,14 @@
                 "download",
                 "Download",
                 () => {
-                  window.location.href = `${rawBaseUrl}${path}${file.name}`;
+                  window.location.href = `${rawBaseUrl}${path}/${file.name}`;
                 }
               );
               actionCell.appendChild(downloadButton);
 
               // Copy URL button
               const copyButton = createIconButton("link", "Copy URL", () => {
-                copyToClipboard(`${baseUrl}${path}${file.name}`);
+                copyToClipboard(`${baseUrl}${path}/${file.name}`);
               });
               actionCell.appendChild(copyButton);
             }
