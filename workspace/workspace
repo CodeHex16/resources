@@ -1,0 +1,68 @@
+{
+  "launch": {
+    "version": "0.1.1"
+  },
+  "folders": [
+    {
+      "name": "🌐 Sito (codehex16.github.io)",
+      "path": "./codehex16.github.io"
+    },
+    {
+      "name": "📄 Documentazione (documentazione)",
+      "path": "./documentazione"
+    },
+    {
+      "name": "🔬 POC (proof-of-concept)",
+      "path": "./proof-of-concept"
+    },
+	  {
+      "name": "❤️ Suppl-AI-Docker (Suppl-AI-Docker)",
+      "path": "./Suppl-AI-Docker"
+    },
+	  {
+      "name": "❤️ Suppl-AI Client (Suppl-AI-Docker/client)",
+      "path": "./Suppl-AI-Docker/client"
+    },
+	  {
+      "name": "❤️ Suppl-AI AdminPanel Suppl-AI-Docker/admin)",
+      "path": "./Suppl-AI-Docker/admin"
+    },
+  	{
+      "name": "❤️ Suppl-AI DB API (Suppl-AI-Docker/api/db)",
+      "path": "./Suppl-AI-Docker/api/db"
+    },
+	  {
+      "name": "❤️ Suppl-AI LLM API (Suppl-AI-Docker/api/llm)",
+      "path": "./Suppl-AI-Docker/api/llm"
+    },
+    {
+      "name": "📚 Risorse (resources)",
+      "path": "./resources"
+    },
+    {
+      "name": "🛠️ CodeHex16 Github (.github)",
+      "path": "./.github"
+    },
+    {
+       "name": "🆘 Guide",
+      "path": "./.gitRules"
+    }
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "tinymist.formatterMode": "typstfmt",
+  },
+  "extensions": {
+    "recommendations": [
+      "hediet.vscode-drawio", // Draw.io integration per diagrammi UML
+      "myriad-dreamin.tinymist", // TinyMist per formattazione del codice .typ
+      "GitHub.copilot", // GitHub Copilot
+      "GitHub.copilot-chat", // GitHub Copilot Chat
+      "GitHub.vscode-pull-request-github", // GitHub Pull Request
+      "github.vscode-github-actions", // GitHub Actions
+      "svelte.svelte-vscode", // Svelte.js support
+      "ms-azuretools.vscode-docker", // Docker support
+      "yzhang.markdown-all-in-one", // Markdown support
+    ]
+  },
+}
